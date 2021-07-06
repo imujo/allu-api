@@ -9,7 +9,7 @@ const db = require('../config/database')
  **/
 
 // Get Languages
-router.get('/languages', isAuth, (req, res)=>{
+router.get('/languages', (req, res)=>{
     let languagesList = []
     db.select('*').from('languages')
         .then(languages => languages.map((language, i)=>{
@@ -20,7 +20,7 @@ router.get('/languages', isAuth, (req, res)=>{
 })
 
 // Get Categories
-router.get('/categories', isAdmin, (req, res)=>{
+router.get('/categories', (req, res)=>{
     let categoriesList = []
     db.select('*').from('categories')
         .then(categories => categories.map((category, i)=>{
@@ -30,21 +30,10 @@ router.get('/categories', isAdmin, (req, res)=>{
         .catch(e => res.status('400').send('There has been an error'))
 })
 
-// Get Read Articles
-router.get('/readArticles', (req, res)=>{
+// Get Articles
+router.get('/articles/:articleType', (req, res)=>{
     let articleList = []
-    db.select('*').from('readarticles')
-        .then(articles => articles.map((article, i)=>{
-            articleList.push(article)
-        }))
-        .then(data => res.json(articleList))
-        .catch(e => res.status('400').send('There has been an error'))
-})
-
-// Get Listen Articles
-router.get('/listenArticles',(req, res)=>{
-    let articleList = []
-    db.select('*').from('listenarticles')
+    db.select('*').from(`${req.params.articleType}articles`)
         .then(articles => articles.map((article, i)=>{
             articleList.push(article)
         }))

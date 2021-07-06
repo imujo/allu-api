@@ -4,13 +4,16 @@ const LocalStrategy = require('passport-local').Strategy
 const {validatePassword} = require('../lib/passwordUtils')
 
 
-
+const parameters ={
+    usernameField: 'email',
+    passwordField: 'password'
+}
 
 const verifyCallback = (email, password, done) =>{
 
     db.select('*').from('users').where({email: email})
         .then(user =>{
-            if (user.length === 0) {return done(null, false)}
+            if (user.length === 0) {return done(null, false, { message: 'A user with that email was not found'})}
 
             const isValid = validatePassword(password, user[0].hash, user[0].salt)
 
@@ -18,7 +21,7 @@ const verifyCallback = (email, password, done) =>{
             if (isValid){
                 return done(null, user);
             }else{
-                return done(null, false)
+                return done(null, false, { message: 'Password is incorrect'})
             }
         })
         .catch(err=>{
@@ -29,7 +32,7 @@ const verifyCallback = (email, password, done) =>{
 
 
 
-const strategy = new LocalStrategy(verifyCallback)
+const strategy = new LocalStrategy(parameters, verifyCallback)
 
 
 passport.use(strategy)
