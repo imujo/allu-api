@@ -73,6 +73,24 @@ router.get('/likes/:articleType/:id',(req, res)=>{
         .catch(e => res.status('400').send('There has been an error'))
 })
 
+// Get User Article Like
+router.get('/like/:articleType/:articleId/:userId',(req, res)=>{
+    const {articleType, articleId, userId} = req.params
+
+    db.select('*').from('likes').where({
+        articletype: articleType,
+        articleid: articleId,
+        userid: userId
+    })
+        .then(like => {
+            like.length > 0 ? 
+                res.json({liked: true})
+            :
+                res.json({liked: false})
+        })
+        .catch(e => res.status('400').send('There has been an error'))
+})
+
 // Get Comments
 router.get('/comments/:articleType/:id',(req, res)=>{
     const {id, articleType} = req.params
@@ -109,15 +127,15 @@ router.post('/addClick/:articleType/:id', (req, res)=>{
 })
 
 // Add Like
-router.post('/addLike/:articleType/:id', isAuth, (req, res)=>{
-    const {id, articleType} = req.params
+router.post('/addLike/:articleType/:articleId/:userId', isAuth, (req, res)=>{
+    const {articleId, articleType, userId} = req.params
 
     let liked;
 
     db.select('*').from('likes').where({
-        username: 'admin',
+        userid: userId,
         articletype: articleType,
-        articleid: parseInt(id)
+        articleid: parseInt(articleId)
     })
         .then(data => {
             data.length > 0 ? liked = true : liked = false
@@ -125,18 +143,18 @@ router.post('/addLike/:articleType/:id', isAuth, (req, res)=>{
         .then(data => {
             liked ? 
                 db.select('*').from('likes').where({
-                    username: 'admin',
+                    userid: userId,
                     articletype: articleType,
-                    articleid: parseInt(id)
+                    articleid: parseInt(articleId)
                 })
                     .del()
                     .then(data => res.send('deleted'))
                     .catch(e => res.status('400').send('There has been an error'))
                 :
                 db('likes').insert({
-                    username: 'admin',
+                    userid: userId,
                     articletype: articleType,
-                    articleid: parseInt(id)
+                    articleid: parseInt(articleId)
                 })
                 .then(data => res.send('added'))
                     .catch(e => res.status('400').send('There has been an error'))
@@ -150,17 +168,17 @@ router.post('/addLike/:articleType/:id', isAuth, (req, res)=>{
 })
 
 // Add Comment
-router.post('/addComment/:articleType/:id/:text', isAuth, (req, res)=>{
-    const {id, articleType, text} = req.params
+router.post('/addComment/:articleType/:articleId/:username/:text', isAuth, (req, res)=>{
+    const {articleType, articleId, username, text} = req.params
 
     db('comments').insert({
         text: text,
-        username: 'admin',
+        username: username,
         articletype: articleType,
-        articleid: parseInt(id)
+        articleid: articleId
     })
         .then(data => res.send())
-        .catch(e => res.status('400').send('There has been an error'))
+        .catch(e => {console.log(e); res.status(400).send('Unable to post the comment')})
 })
 
 module.exports = router;

@@ -66,8 +66,10 @@ app.use('/auth', authRoutes)
 app.use('/api', apiRoutes)
 
 
+
+app.use(express.static('C:/Users/ivomu/Documents/Dev/FIVERR/maddemn3/allu/build'))
+
 app.get('/*', (req,res)=>{
-    console.log('React')
     res.sendFile('C:/Users/ivomu/Documents/Dev/FIVERR/maddemn3/allu/build/index.html')
 })
 
