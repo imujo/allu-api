@@ -10,6 +10,7 @@ const passport = require('passport');
 // IMPORTING ROUTES
 const authRoutes = require('./routes/authRoutes')
 const apiRoutes = require('./routes/apiRoutes')
+const adminRoutes = require('./routes/adminRoutes')
 
 
 
@@ -64,6 +65,7 @@ app.use(passport.session())
 // USE ROUTES
 app.use('/auth', authRoutes)
 app.use('/api', apiRoutes)
+app.use('/admin', adminRoutes)
 
 
 

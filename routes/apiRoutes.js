@@ -2,6 +2,7 @@ const router = require('express').Router();
 const {isAuth, isAdmin} = require('./authMiddleware')
 const db = require('../config/database')
 
+
 /**
 
  *--------------------- GET ROUTES ---------------------*
@@ -10,23 +11,15 @@ const db = require('../config/database')
 
 // Get Languages
 router.get('/languages', (req, res)=>{
-    let languagesList = []
     db.select('*').from('languages')
-        .then(languages => languages.map((language, i)=>{
-            languagesList.push(language['language'])
-        }))
-        .then(data => res.json(languagesList))
+        .then(data => res.json(data))
         .catch(e => res.status('400').send('There has been an error'))
 })
 
 // Get Categories
 router.get('/categories', (req, res)=>{
-    let categoriesList = []
     db.select('*').from('categories')
-        .then(categories => categories.map((category, i)=>{
-            categoriesList.push(category['category'])
-        }))
-        .then(data => res.json(categoriesList))
+        .then(data => res.json(data))
         .catch(e => res.status('400').send('There has been an error'))
 })
 
