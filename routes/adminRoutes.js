@@ -1,8 +1,8 @@
 const router = require('express').Router();
 const {isAuth, isAdmin} = require('./authMiddleware')
 const db = require('../config/database')
-const passport = require('passport');
 const fs = require('fs')
+const genPassword = require('../lib/passwordUtils').genPassword;
 var fileupload = require("express-fileupload");
 
 router.use(fileupload());
@@ -49,6 +49,8 @@ router.get('/readArticles/:id', (req, res)=>{
         .then(data => {
             res.json(data[0])
         })
+        .catch(e => res.status(400).json('There has been an error'))
+
 
 })
 
@@ -144,12 +146,13 @@ router.get('/listenArticles/:id', (req, res)=>{
         .then(data => {
             res.json(data[0])
         })
+        .catch(e => res.status(400).json('There has been an error'))
 
 })
 
 // Create
 router.post('/listenArticles', (req, res)=>{
-    const { title, oneliner, category, language, created_by, text, dateadded  } = req.body
+    const { title, oneliner, category, language, created_by, text, dateadded, audiofile  } = req.body
 
 
     
@@ -161,7 +164,8 @@ router.post('/listenArticles', (req, res)=>{
         language: language,
         created_by: created_by,
         text: text,
-        dateadded: dateadded
+        dateadded: dateadded,
+        audiofile: audiofile
     })
         .then(d =>res.json('Success'))
         .catch(e => {res.status(400).json('Fail'); console.log('Article not added')})
@@ -489,14 +493,41 @@ router.get('/users/:id', (req, res)=>{
 })
 
 // Create
-router.post('/users', passport.authenticate('local'), (req, res)=>{
-    if (req.user){
-        res.json({status: 200, msg: 'Successfuly logged in!', user: req.user[0], isauth: true})
-    }else{
-        res.status(400).json({status: 400, msg: 'Invalid password and/or email', user: {}, isauth: false})
+router.post('/users', (req, res) => {
+    const {email, username, password, admin} = req.body
+
+    const {salt, hash} = genPassword(password)
+    
+    
+
+    const registerUser = () => {
+        db('users').insert({
+            email: email,
+            username: username,
+            hash: hash,
+            salt: salt,
+            admin: admin,
+            joined: new Date()
+        })
+            .then(data => {
+                db.select('*').from('users').where({email: email})
+                    .then(data => res.json({status: 200, msg: 'User successfuly registered.', user: data[0], isauth: true }))
+            })
+            .catch(err => res.status(400).json({status: 400, msg: "Couldn't register user.", user: {}, isauth: false}))
     }
-}
-);
+
+    db.select('*').from('users').where({email: email}).orWhere({username: username})
+        .then(users => {
+            if (users.length > 0){
+                res.status(400).json({status: 400, msg: 'User already exists. Please enter a different email and/or username.', user: {}, isauth: false})
+            }else{
+                registerUser()
+            }
+        })
+
+    
+
+});
 
 // Update
 router.put('/users/:id', (req, res)=>{
@@ -543,7 +574,7 @@ router.delete('/users/:id', (req, res)=>{
 router.post('/listenArticle/upload', (req, res)=>{
     if (req.files === null){
         console.log('No file uploaded')
-        return res.sendStatus(400).json({msg: 'No file uploaded'})
+        return res.sendStatus(400).json({status: false})
     }
     console.log(req.files)
     const file = req.files.file
@@ -551,10 +582,10 @@ router.post('/listenArticle/upload', (req, res)=>{
     file.mv(`../api/public/audio/${file.name}`, e =>{
         if (e){
             console.log(e)
-            return res.status(500).send({msg: "Couldn't move the file"})
+            return res.status(500).send({status: false})
         }
 
-        res.json({ fileName: file.name, filePath: `/public/audio/${file.name}`})
+        res.json({ status: true})
     })
 })
 
@@ -562,7 +593,7 @@ router.post('/listenArticle/upload', (req, res)=>{
 router.post('/categories/icons/upload', (req, res)=>{
     if (req.files === null){
         console.log('No file uploaded')
-        return res.sendStatus(400).json({msg: 'No file uploaded'})
+        return res.sendStatus(400).json({status: false})
     }
     console.log(req.files)
     const file = req.files.file
@@ -570,10 +601,10 @@ router.post('/categories/icons/upload', (req, res)=>{
     file.mv(`../api/public/categoryIcons/${file.name}`, e =>{
         if (e){
             console.log(e)
-            return res.status(500).send({msg: "Couldn't move the file"})
+            return res.sendStatus(400).json({status: false})
         }
 
-        res.json({ fileName: file.name, filePath: `/public/audio/${file.name}`})
+        res.json({ status: true})
     })
 })
 
@@ -581,7 +612,7 @@ router.post('/categories/icons/upload', (req, res)=>{
 router.post('/categories/images/upload', (req, res)=>{
     if (req.files === null){
         console.log('No file uploaded')
-        return res.sendStatus(400).json({msg: 'No file uploaded'})
+        return res.sendStatus(400).json({status: false})
     }
     console.log(req.files)
     const file = req.files.file
@@ -589,10 +620,10 @@ router.post('/categories/images/upload', (req, res)=>{
     file.mv(`../api/public/categoryImages/${file.name}`, e =>{
         if (e){
             console.log(e)
-            return res.status(500).send({msg: "Couldn't move the file"})
+            return res.sendStatus(400).json({status: false})
         }
 
-        res.json({ fileName: file.name, filePath: `/public/audio/${file.name}`})
+        res.json({ status: true})
     })
 })
 
@@ -600,7 +631,7 @@ router.post('/categories/images/upload', (req, res)=>{
 router.post('/languages/upload', (req, res)=>{
     if (req.files === null){
         console.log('No file uploaded')
-        return res.sendStatus(400).json({msg: 'No file uploaded'})
+        return res.sendStatus(400).json({status: false})
     }
     console.log(req.files)
     const file = req.files.file
@@ -608,12 +639,17 @@ router.post('/languages/upload', (req, res)=>{
     file.mv(`../api/public/flags/${file.name}`, e =>{
         if (e){
             console.log(e)
-            return res.status(500).send({msg: "Couldn't move the file"})
+            return res.sendStatus(400).json({status: false})
         }
 
-        res.json({ fileName: file.name, filePath: `/public/audio/${file.name}`})
+        res.json({ status: true})
     })
 })
+
+
+
+
+
 
 router.get('/listDir/:folderName', (req, res)=>{
     const folderName = req.params.folderName

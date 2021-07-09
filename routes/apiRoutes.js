@@ -23,14 +23,20 @@ router.get('/categories', (req, res)=>{
         .catch(e => res.status('400').send('There has been an error'))
 })
 
+// Get Category
+router.get('/category/:category', (req, res)=>{
+    const category = req.params.category
+
+    db.select('*').from('categories')
+        .where({category: category})
+        .then(data => {console.log(data[0]);res.json(data[0])})
+        .catch(e => res.status('400').json('There has been an error'))
+})
+
 // Get Articles
 router.get('/articles/:articleType', (req, res)=>{
-    let articleList = []
     db.select('*').from(`${req.params.articleType}articles`)
-        .then(articles => articles.map((article, i)=>{
-            articleList.push(article)
-        }))
-        .then(data => res.json(articleList))
+        .then(data => res.json(data))
         .catch(e => res.status('400').send('There has been an error'))
 })
 
@@ -170,7 +176,7 @@ router.post('/addComment/:articleType/:articleId/:username/:text', isAuth, (req,
         articletype: articleType,
         articleid: articleId
     })
-        .then(data => res.send())
+        .then(data => {console.log('Comment posted'); res.send()})
         .catch(e => {console.log(e); res.status(400).send('Unable to post the comment')})
 })
 
