@@ -1,5 +1,5 @@
 const router = require('express').Router();
-const {isAuth, isAdmin} = require('./authMiddleware')
+const { isAdmin} = require('./authMiddleware')
 const db = require('../config/database')
 const fs = require('fs')
 const genPassword = require('../lib/passwordUtils').genPassword;
@@ -23,6 +23,7 @@ router.get('/readArticles', (req, res)=>{
     let sortQuery = JSON.parse(sort)
     let rangeQuery = JSON.parse(range)
     let filterQuery = JSON.parse(filter)
+    console.log(range)
 
 
     db.select('*').from('readarticles')
@@ -49,7 +50,7 @@ router.get('/readArticles/:id', (req, res)=>{
         .then(data => {
             res.json(data[0])
         })
-        .catch(e => res.status(400).json('There has been an error'))
+        .catch(() => res.status(400).json('There has been an error'))
 
 
 })
@@ -67,8 +68,8 @@ router.post('/readArticles',  (req, res)=>{
         text: text,
         dateadded: dateadded
     })
-        .then(data => {res.json('Success'); console.log('Article added')})
-        .catch(e => {res.status(400).json('Fail'); console.log('Article not added')})
+        .then(() => {res.json('Success'); console.log('Article added')})
+        .catch(() => {res.status(400).json('Fail'); console.log('Article not added')})
 })
 
 // Update
@@ -86,8 +87,8 @@ router.put('/readArticles/:id', (req, res)=>{
             text: text,
             dateadded: dateadded
         })
-        .then(data => {res.json('Success'); console.log('Article edited')})
-        .catch(e => {res.status(400).json('Fail'); console.log('Article not edited')})
+        .then(() => {res.json('Success'); console.log('Article edited')})
+        .catch(() => {res.status(400).json('Fail'); console.log('Article not edited')})
 })
 
 // Delete
@@ -96,8 +97,8 @@ router.delete('/readArticles/:id', (req, res)=>{
 
     db('readarticles').where({id: id})
         .del()
-        .then(data => {res.json('Success'); console.log('Article deleted')})
-        .catch(e => {res.status(400).json('Fail'); console.log('Article not deleted')})
+        .then(() => {res.json('Success'); console.log('Article deleted')})
+        .catch(() => {res.status(400).json('Fail'); console.log('Article not deleted')})
 })
 
 
@@ -146,7 +147,7 @@ router.get('/listenArticles/:id', (req, res)=>{
         .then(data => {
             res.json(data[0])
         })
-        .catch(e => res.status(400).json('There has been an error'))
+        .catch(() => res.status(400).json('There has been an error'))
 
 })
 
@@ -167,8 +168,8 @@ router.post('/listenArticles', (req, res)=>{
         dateadded: dateadded,
         audiofile: audiofile
     })
-        .then(d =>res.json('Success'))
-        .catch(e => {res.status(400).json('Fail'); console.log('Article not added')})
+        .then(() =>res.json('Success'))
+        .catch(() => {res.status(400).json('Fail'); console.log('Article not added')})
 })
 
 
@@ -188,8 +189,8 @@ router.put('/listenArticles/:id', (req, res)=>{
             dateadded: dateadded,
             audiofile: audiofile
         })
-            .then(data => {res.json('Success'); console.log('Article edited')})
-            .catch(e => {res.status(400).json('Fail'); console.log('Article not edited')})
+            .then(() => {res.json('Success'); console.log('Article edited')})
+            .catch(() => {res.status(400).json('Fail'); console.log('Article not edited')})
 })
 
 // Delete
@@ -198,8 +199,8 @@ router.delete('/listenArticles/:id', (req, res)=>{
 
     db('listenarticles').where({id: id})
         .del()
-        .then(data => {res.json('Success'); console.log('Article deleted')})
-        .catch(e => {res.status(400).json('Fail'); console.log('Article not deleted')})
+        .then(() => {res.json('Success'); console.log('Article deleted')})
+        .catch(() => {res.status(400).json('Fail'); console.log('Article not deleted')})
 })
 
 
@@ -245,7 +246,7 @@ router.get('/categories/:id', (req, res)=>{
         .then(data => {
             res.json(data[0])
         })
-        .catch(e => {console.log('Cant get one'); res.status(400).json('Fail')})
+        .catch(() => {console.log('Cant get one'); res.status(400).json('Fail')})
 })
 
 // Create
@@ -260,8 +261,8 @@ router.post('/categories', (req, res)=>{
         imagefile: imagefile,
         iconfile: iconfile
     })
-        .then(d =>{console.log('Category added'); res.json('Success')})
-        .catch(e => {res.status(400).json('Fail'); console.log('Category not added')})
+        .then(() =>{console.log('Category added'); res.json('Success')})
+        .catch(() => {res.status(400).json('Fail'); console.log('Category not added')})
 })
 
 // Update
@@ -275,8 +276,8 @@ router.put('/categories/:id', (req, res)=>{
             imagefile: imagefile,
             iconfile: iconfile
         })
-            .then(data => {res.json('Success'); console.log('Article edited')})
-            .catch(e => {res.status(400).json('Fail'); console.log('Article not edited')})
+            .then(() => {res.json('Success'); console.log('Article edited')})
+            .catch(() => {res.status(400).json('Fail'); console.log('Article not edited')})
 })
 
 // Delete
@@ -285,8 +286,8 @@ router.delete('/categories/:id', (req, res)=>{
 
     db('categories').where({id: id})
         .del()
-        .then(data => {res.json('Success'); console.log('Article deleted')})
-        .catch(e => {res.status(400).json('Fail'); console.log('Article not deleted')})
+        .then(() => {res.json('Success'); console.log('Article deleted')})
+        .catch(() => {res.status(400).json('Fail'); console.log('Article not deleted')})
 })
 
 
@@ -334,7 +335,7 @@ router.get('/languages/:id', (req, res)=>{
         .then(data => {
             res.json(data[0])
         })
-        .catch(e => {console.log('Cant get one'); res.status(400).json('Fail')})
+        .catch(() => {console.log('Cant get one'); res.status(400).json('Fail')})
 })
 
 // Create
@@ -349,8 +350,8 @@ router.post('/languages', (req, res)=>{
         imageurl: imageurl,
         flagfile: flagfile
     })
-        .then(d =>{console.log('Category added'); res.json('Success')})
-        .catch(e => {res.status(400).json('Fail'); console.log('Category not added')})
+        .then(() =>{console.log('Category added'); res.json('Success')})
+        .catch(() => {res.status(400).json('Fail'); console.log('Category not added')})
 })
 
 // Update
@@ -364,8 +365,8 @@ router.put('/languages/:id', (req, res)=>{
             imageurl: imageurl,
             flagfile: flagfile
         })
-            .then(data => {res.json('Success'); console.log('Article edited')})
-            .catch(e => {res.status(400).json('Fail'); console.log('Article not edited')})
+            .then(() => {res.json('Success'); console.log('Article edited')})
+            .catch(() => {res.status(400).json('Fail'); console.log('Article not edited')})
 })
 
 // Delete
@@ -374,8 +375,8 @@ router.delete('/languages/:id', (req, res)=>{
 
     db('languages').where({id: id})
         .del()
-        .then(data => {res.json('Success'); console.log('Article deleted')})
-        .catch(e => {res.status(400).json('Fail'); console.log('Article not deleted')})
+        .then(() => {res.json('Success'); console.log('Article deleted')})
+        .catch(() => {res.status(400).json('Fail'); console.log('Article not deleted')})
 })
 
 
@@ -427,7 +428,7 @@ router.get('/comments/:id', (req, res)=>{
         .then(data => {
             res.json(data[0])
         })
-        .catch(e => {console.log('Cant get one'); res.status(400).json('Fail')})
+        .catch(() => {console.log('Cant get one'); res.status(400).json('Fail')})
 })
 
 // Delete
@@ -436,8 +437,8 @@ router.delete('/comments/:id', (req, res)=>{
 
     db('comments').where({id: id})
         .del()
-        .then(data => {res.json('Success'); console.log('Article deleted')})
-        .catch(e => {res.status(400).json('Fail'); console.log('Article not deleted')})
+        .then(() => {res.json('Success'); console.log('Article deleted')})
+        .catch(() => {res.status(400).json('Fail'); console.log('Article not deleted')})
 })
 
 
@@ -489,7 +490,7 @@ router.get('/users/:id', (req, res)=>{
         .then(data => {
             res.json(data[0])
         })
-        .catch(e => {console.log('Cant get one'); res.status(400).json('Fail')})
+        .catch(() => {console.log('Cant get one'); res.status(400).json('Fail')})
 })
 
 // Create
@@ -509,11 +510,11 @@ router.post('/users', (req, res) => {
             admin: admin,
             joined: new Date()
         })
-            .then(data => {
+            .then(() => {
                 db.select('*').from('users').where({email: email})
                     .then(data => res.json({status: 200, msg: 'User successfuly registered.', user: data[0], isauth: true }))
             })
-            .catch(err => res.status(400).json({status: 400, msg: "Couldn't register user.", user: {}, isauth: false}))
+            .catch(() => res.status(400).json({status: 400, msg: "Couldn't register user.", user: {}, isauth: false}))
     }
 
     db.select('*').from('users').where({email: email}).orWhere({username: username})
@@ -540,8 +541,8 @@ router.put('/users/:id', (req, res)=>{
             username: username,
             admin: admin
         })
-            .then(data => {res.json('Success'); console.log('Article edited')})
-            .catch(e => {res.status(400).json('Fail'); console.log('Article not edited')})
+            .then(() => {res.json('Success'); console.log('Article edited')})
+            .catch(() => {res.status(400).json('Fail'); console.log('Article not edited')})
 })
 
 // Delete
@@ -550,8 +551,8 @@ router.delete('/users/:id', (req, res)=>{
 
     db('users').where({id: id})
         .del()
-        .then(data => {res.json('Success'); console.log('Article deleted')})
-        .catch(e => {res.status(400).json('Fail'); console.log('Article not deleted')})
+        .then(() => {res.json('Success'); console.log('Article deleted')})
+        .catch(() => {res.status(400).json('Fail'); console.log('Article not deleted')})
 })
 
 
@@ -663,6 +664,70 @@ router.get('/listDir/:folderName', (req, res)=>{
         console.log(files)
         res.json(files)
     })
+})
+
+
+
+
+/**
+
+ *--------------------- MISC ---------------------*
+
+ **/
+
+
+ // GET MISC ITEMS
+router.get('/misc', (req, res)=>{
+    const {sort, range, filter} = req.query
+
+
+    let sortQuery = JSON.parse(sort)
+    let rangeQuery = JSON.parse(range)
+    let filterQuery = JSON.parse(filter)
+
+    console.log(rangeQuery)
+
+
+
+    db.select('*').from('misc')
+        .where(filterQuery)
+        .orderBy(sortQuery[0], sortQuery[1])
+        .then(data => data.slice(rangeQuery[0], rangeQuery[1]))
+        .then(data => {
+            db.select('*').from('misc')
+                .where(filterQuery)
+                .then(allData => {
+                    res.set('Content-Range', `posts ${rangeQuery[0]}-${rangeQuery[1]}/${allData.length}`)
+                    res.json(data)
+            })
+        })
+
+})
+
+// getOne
+router.get('/misc/:id', (req, res)=>{
+    const id = req.params.id
+
+    db.select('*').from('misc')
+        .where({id: id})
+        .then(data => {
+            res.json(data[0])
+        })
+        .catch(() => {console.log('Cant get one'); res.status(400).json('Fail')})
+})
+
+// UPDATE
+router.put('/misc/:id', (req, res)=>{
+    const { value  } = req.body
+    const id = req.params.id
+    console.log(value)
+
+    db('misc').where({id: id})
+        .update({
+            value: value,
+        })
+            .then(() => {res.json('Success'); console.log('About text edited')})
+            .catch(() => {res.status(400).json('Fail'); console.log('About text not edited')})
 })
 
 

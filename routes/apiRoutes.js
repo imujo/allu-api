@@ -1,6 +1,7 @@
 const router = require('express').Router();
-const {isAuth, isAdmin} = require('./authMiddleware')
+const {isAuth} = require('./authMiddleware')
 const db = require('../config/database')
+var nodemailer = require('nodemailer');
 
 
 /**
@@ -102,6 +103,12 @@ router.get('/comments/:articleType/:id',(req, res)=>{
         .catch(e => res.status('400').send('There has been an error'))
 })
 
+// Get About Us
+router.get('/aboutText', (req,res)=>{
+    db.select('*').from('misc').where({name: 'about'})
+        .then(data => res.json(data[0].value))
+        .catch(e => console.log('Error getting about text'))
+})
 
 
 
@@ -180,4 +187,55 @@ router.post('/addComment/:articleType/:articleId/:username/:text', isAuth, (req,
         .catch(e => {console.log(e); res.status(400).send('Unable to post the comment')})
 })
 
+
+
+var transport = {
+    // host: 'smtp-relay.sendinblue.com',
+    // port: 587,
+    service: 'SendinBlue',
+    auth: {
+    user: process.env.SENDINBLUE_USERNAME,
+    pass: process.env.SENDINBLUE_PASSWORD
+  }
+}
+
+console.log(process.env.SENDINBLUE_PASSWORD)
+console.log(process.env.SENDINBLUE_USERNAME)
+
+var transporter = nodemailer.createTransport(transport)
+
+transporter.verify((error, success) => {
+  if (error) {
+    console.log(error);
+  } else {
+    console.log('Server is ready to take messages');
+  }
+});
+
+// Send Email
+router.post('/sendEmail', (req,res)=>{
+    const {email, message} = req.body
+    const content = `email: ${email} \nmessage: ${message} `
+
+    const mail ={
+        from: email,
+        to: 'ivo.mujo.3@gmail.com',
+        subject: 'AllU Contact',
+        text: content
+    }
+
+    transporter.sendMail(mail, (err, data) => {
+        if (err) {
+          console.log(err)
+          res.json({
+            status: 'fail'
+          })
+        } else {
+          res.json({
+           status: 'success'
+          })
+        }
+      })
+
+})
 module.exports = router;

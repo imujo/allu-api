@@ -69,10 +69,10 @@ app.use('/admin', adminRoutes)
 
 
 
-app.use(express.static('C:/Users/ivomu/Documents/Dev/FIVERR/maddemn3/allu/build'))
+app.use(express.static(process.env.PATH_TO_BUILD))
 
 app.get('/*', (req,res)=>{
-    res.sendFile('C:/Users/ivomu/Documents/Dev/FIVERR/maddemn3/allu/build/index.html')
+    res.sendFile(`${process.env.PATH_TO_BUILD}/index.html`)
 })
 
 
