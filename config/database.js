@@ -17,5 +17,8 @@ const db = knex({
     }
 });
 
+db.select('*').from('users')
+    .then(d=>console.log('connected'))
+    .catch(e=>console.log('not connected'))
 
 module.exports = db;

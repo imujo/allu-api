@@ -199,8 +199,6 @@ var transport = {
   }
 }
 
-console.log(process.env.SENDINBLUE_PASSWORD)
-console.log(process.env.SENDINBLUE_USERNAME)
 
 var transporter = nodemailer.createTransport(transport)
 
