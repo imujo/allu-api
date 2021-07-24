@@ -17,7 +17,7 @@ const db = knex({
         database : process.env.DATABASE_NAME
     },
     // connection: {
-    //     connectionString: 'postgresql://doadmin:dfmz0gbsuqedaouw@allu-database-do-user-9551667-0.b.db.ondigitalocean.com:25060/defaultdb',
+    //     connectionString: process.env.CONNECTION,
     //     ssl: {
     //         rejectUnauthorized: false
     //     }
