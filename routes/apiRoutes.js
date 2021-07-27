@@ -194,9 +194,9 @@ var transport = {
     // port: 587,
     service: 'SendinBlue',
     auth: {
-    user: process.env.SENDINBLUE_USERNAME,
-    pass: process.env.SENDINBLUE_PASSWORD
-  }
+        user: process.env.SENDINBLUE_USERNAME,
+        pass: process.env.SENDINBLUE_PASSWORD
+    }
 }
 
 

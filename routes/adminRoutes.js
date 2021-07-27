@@ -9,6 +9,7 @@ router.use(fileupload());
 
 router.use(isAdmin)
 
+
 /**
 
  *--------------------- READ ARTICLES ---------------------*
@@ -580,7 +581,7 @@ router.post('/listenArticle/upload', (req, res)=>{
     console.log(req.files)
     const file = req.files.file
 
-    file.mv(`../api/public/audio/${file.name}`, e =>{
+    file.mv(`${process.env.PATH_TO_PUBLIC}/audio/${file.name}`, e =>{
         if (e){
             console.log(e)
             return res.status(500).send({status: false})
@@ -599,7 +600,7 @@ router.post('/categories/icons/upload', (req, res)=>{
     console.log(req.files)
     const file = req.files.file
 
-    file.mv(`../api/public/categoryIcons/${file.name}`, e =>{
+    file.mv(`${process.env.PATH_TO_PUBLIC}/categoryIcons/${file.name}`, e =>{
         if (e){
             console.log(e)
             return res.sendStatus(400).json({status: false})
@@ -618,7 +619,7 @@ router.post('/categories/images/upload', (req, res)=>{
     console.log(req.files)
     const file = req.files.file
 
-    file.mv(`../api/public/categoryImages/${file.name}`, e =>{
+    file.mv(`${process.env.PATH_TO_PUBLIC}/categoryImages/${file.name}`, e =>{
         if (e){
             console.log(e)
             return res.sendStatus(400).json({status: false})
@@ -637,7 +638,7 @@ router.post('/languages/upload', (req, res)=>{
     console.log(req.files)
     const file = req.files.file
 
-    file.mv(`../api/public/flags/${file.name}`, e =>{
+    file.mv(`${process.env.PATH_TO_PUBLIC}/flags/${file.name}`, e =>{
         if (e){
             console.log(e)
             return res.sendStatus(400).json({status: false})
@@ -729,6 +730,128 @@ router.put('/misc/:id', (req, res)=>{
             .then(() => {res.json('Success'); console.log('About text edited')})
             .catch(() => {res.status(400).json('Fail'); console.log('About text not edited')})
 })
+
+
+
+
+
+
+
+
+
+/**
+
+ *--------------------- LISTEN ARTICLE FILE ---------------------*
+
+ **/
+
+
+
+// getList
+router.get('/fileListenArticle', (req, res)=>{
+    const {sort, range, filter} = req.query
+
+
+    let sortQuery = JSON.parse(sort)
+    let rangeQuery = JSON.parse(range)
+    let filterQuery = JSON.parse(filter)
+
+    
+
+    let files = fs.readdirSync(`${__dirname}/../public/audio`)
+    let rangeFiles = files.slice(rangeQuery[0], rangeQuery[1])
+
+
+    let returnFiles = []
+
+    rangeFiles.forEach(file=>{
+        const size = (fs.statSync(`${__dirname}/../public/audio/${file}`).size * 0.000001).toFixed(2)
+        console.log(size)
+        returnFiles.push({
+            name: file,
+            size: `${size} MB`
+        })
+    })
+    res.set('Content-Range', `posts ${rangeQuery[0]}-${rangeQuery[1]}/${files.length}`)
+    res.json(returnFiles)
+
+})
+
+// getOne
+router.get('/users/:id', (req, res)=>{
+    const id = req.params.id
+
+    db.select('*').from('users')
+        .where({id: id})
+        .then(data => {
+            res.json(data[0])
+        })
+        .catch(() => {console.log('Cant get one'); res.status(400).json('Fail')})
+})
+
+// Create
+router.post('/users', (req, res) => {
+    const {email, username, password, admin} = req.body
+
+    const {salt, hash} = genPassword(password)
+    
+    
+
+    const registerUser = () => {
+        db('users').insert({
+            email: email,
+            username: username,
+            hash: hash,
+            salt: salt,
+            admin: admin,
+            joined: new Date()
+        })
+            .then(() => {
+                db.select('*').from('users').where({email: email})
+                    .then(data => res.json({status: 200, msg: 'User successfuly registered.', user: data[0], isauth: true }))
+            })
+            .catch(() => res.status(400).json({status: 400, msg: "Couldn't register user.", user: {}, isauth: false}))
+    }
+
+    db.select('*').from('users').where({email: email}).orWhere({username: username})
+        .then(users => {
+            if (users.length > 0){
+                res.status(400).json({status: 400, msg: 'User already exists. Please enter a different email and/or username.', user: {}, isauth: false})
+            }else{
+                registerUser()
+            }
+        })
+
+    
+
+});
+
+// Update
+router.put('/users/:id', (req, res)=>{
+    const { email, username, admin  } = req.body
+    const id = req.params.id
+
+    db('users').where({id: id})
+        .update({
+            email: email,
+            username: username,
+            admin: admin
+        })
+            .then(() => {res.json('Success'); console.log('Article edited')})
+            .catch(() => {res.status(400).json('Fail'); console.log('Article not edited')})
+})
+
+// Delete
+router.delete('/users/:id', (req, res)=>{
+    const id = req.params.id
+
+    db('users').where({id: id})
+        .del()
+        .then(() => {res.json('Success'); console.log('Article deleted')})
+        .catch(() => {res.status(400).json('Fail'); console.log('Article not deleted')})
+})
+
+
 
 
 module.exports = router;
