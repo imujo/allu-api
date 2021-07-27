@@ -581,7 +581,7 @@ router.post('/listenArticle/upload', (req, res)=>{
     console.log(req.files)
     const file = req.files.file
 
-    file.mv(`${process.env.PATH_TO_PUBLIC}/audio/${file.name}`, e =>{
+    file.mv(`${process.env.PATH_TO_PU}/audio/${file.name}`, e =>{
         if (e){
             console.log(e)
             return res.status(500).send({status: false})
@@ -600,7 +600,7 @@ router.post('/categories/icons/upload', (req, res)=>{
     console.log(req.files)
     const file = req.files.file
 
-    file.mv(`${process.env.PATH_TO_PUBLIC}/categoryIcons/${file.name}`, e =>{
+    file.mv(`${process.env.PATH_TO_PU}/categoryIcons/${file.name}`, e =>{
         if (e){
             console.log(e)
             return res.sendStatus(400).json({status: false})
@@ -619,7 +619,7 @@ router.post('/categories/images/upload', (req, res)=>{
     console.log(req.files)
     const file = req.files.file
 
-    file.mv(`${process.env.PATH_TO_PUBLIC}/categoryImages/${file.name}`, e =>{
+    file.mv(`${process.env.PATH_TO_PU}/categoryImages/${file.name}`, e =>{
         if (e){
             console.log(e)
             return res.sendStatus(400).json({status: false})
@@ -638,7 +638,7 @@ router.post('/languages/upload', (req, res)=>{
     console.log(req.files)
     const file = req.files.file
 
-    file.mv(`${process.env.PATH_TO_PUBLIC}/flags/${file.name}`, e =>{
+    file.mv(`${process.env.PATH_TO_PU}/flags/${file.name}`, e =>{
         if (e){
             console.log(e)
             return res.sendStatus(400).json({status: false})
