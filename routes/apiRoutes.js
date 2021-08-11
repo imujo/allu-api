@@ -1,7 +1,6 @@
 const router = require('express').Router();
 const {isAuth} = require('./authMiddleware')
 const db = require('../config/database')
-var nodemailer = require('nodemailer');
 
 
 /**
@@ -188,52 +187,5 @@ router.post('/addComment/:articleType/:articleId/:username/:text', isAuth, (req,
 })
 
 
-
-var transport = {
-    // host: 'smtp-relay.sendinblue.com',
-    // port: 587,
-    service: 'SendinBlue',
-    auth: {
-        user: process.env.SENDINBLUE_USERNAME,
-        pass: process.env.SENDINBLUE_PASSWORD
-    }
-}
-
-
-var transporter = nodemailer.createTransport(transport)
-
-transporter.verify((error, success) => {
-  if (error) {
-    console.log(error);
-  } else {
-    console.log('Server is ready to take messages');
-  }
-});
-
-// Send Email
-router.post('/sendEmail', (req,res)=>{
-    const {email, message} = req.body
-    const content = `email: ${email} \nmessage: ${message} `
-
-    const mail ={
-        from: email,
-        to: 'ivo.mujo.3@gmail.com',
-        subject: 'AllU Contact',
-        text: content
-    }
-
-    transporter.sendMail(mail, (err, data) => {
-        if (err) {
-          console.log(err)
-          res.json({
-            status: 'fail'
-          })
-        } else {
-          res.json({
-           status: 'success'
-          })
-        }
-      })
-
-})
 module.exports = router;
+

@@ -271,14 +271,29 @@ router.put('/categories/:id', (req, res)=>{
     const { category, imagefile, iconfile  } = req.body
     const id = req.params.id
 
-    db('categories').where({id: id})
-        .update({
-            category: category,
-            imagefile: imagefile,
-            iconfile: iconfile
+    var cat;
+
+
+    db('categories').where({id: id}).select('category')
+        .then(ret =>{
+            cat = ret[0].category
+            return db('categories').where({id: id}).update({
+                category: category,
+                imagefile: imagefile,
+                iconfile: iconfile
+            })
         })
-            .then(() => {res.json('Success'); console.log('Article edited')})
-            .catch(() => {res.status(400).json('Fail'); console.log('Article not edited')})
+        .then(() => {
+            console.log(cat)
+            return db('listenarticles').where({category: cat}).update({category: category})
+        })
+        .then((d)=>{
+            console.log(d)
+            return db('readarticles').where({category: cat}).update({category: category})
+            
+        })
+        .then(()=> {res.json('Success'); console.log('Article edited')})
+        .catch(() => {res.status(400).json('Fail'); console.log('Article not edited')})
 })
 
 // Delete
@@ -341,7 +356,7 @@ router.get('/languages/:id', (req, res)=>{
 
 // Create
 router.post('/languages', (req, res)=>{
-    const { language, imageurl, flagfile } = req.body
+    const { language, imageurl, flagfile, order_number } = req.body
 
 
     
@@ -349,7 +364,8 @@ router.post('/languages', (req, res)=>{
     db('languages').insert({
         language: language,
         imageurl: imageurl,
-        flagfile: flagfile
+        flagfile: flagfile,
+        order_number: order_number
     })
         .then(() =>{console.log('Category added'); res.json('Success')})
         .catch(() => {res.status(400).json('Fail'); console.log('Category not added')})
@@ -357,14 +373,15 @@ router.post('/languages', (req, res)=>{
 
 // Update
 router.put('/languages/:id', (req, res)=>{
-    const { language, imageurl, flagfile } = req.body
+    const { language, imageurl, flagfile, order_number } = req.body
     const id = req.params.id
 
     db('languages').where({id: id})
         .update({
             language: language,
             imageurl: imageurl,
-            flagfile: flagfile
+            flagfile: flagfile,
+            order_number: order_number
         })
             .then(() => {res.json('Success'); console.log('Article edited')})
             .catch(() => {res.status(400).json('Fail'); console.log('Article not edited')})
