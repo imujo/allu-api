@@ -11,7 +11,7 @@ const db = require('../config/database')
 
 // Get Languages
 router.get('/languages', (req, res)=>{
-    db.select('*').from('languages')
+    db.select('*').from('languages').orderBy('order_number')
         .then(data => res.json(data))
         .catch(e => res.status('400').send('There has been an error'))
 })
